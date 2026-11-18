@@ -1,6 +1,7 @@
 // Font scale test: the markdown follows a size pushed with ImGui::PushFont(NULL, size), relative to the frame's base
 // size, through Dear ImGui's null backend. Its fonts (GetFont, GetCodeFont) and the height of a rendered paragraph
-// scale with the pushed size; a render inside a render (a fenced block's markdown) keeps the outer one's scale.
+// scale with the pushed size; a render inside a render (a fenced block's markdown) keeps the outer one's scale. The
+// fonts an application gives (MarkdownFontOptions::boldFont...) are used as they are.
 #include "imgui.h"
 #include "imgui_internal.h"  // ImAbs
 #include "imgui_impl_null.h"
@@ -85,6 +86,21 @@ int main(int, char**)
     ok = Expect("a render inside a render keeps the outer scale (no push)", Near(normal.nestedFontSize, normal.fontSize))
          && ok;
     ok = Expect("a render inside a render keeps the outer scale (half)", Near(half.nestedFontSize, half.fontSize)) && ok;
+
+    // Fonts given by the application are used as they are
+    RichMd::Context* fileFonts = RichMd::GetCurrentContext();
+    ImFont* hostFont = ImGui::GetIO().Fonts->AddFontDefault();
+    RichMd::MarkdownOptions hostOptions;
+    hostOptions.fontOptions.boldFont = hostFont;
+    hostOptions.fontOptions.codeFont = hostFont;
+    RichMd::Context* hostFonts = RichMd::CreateContext(hostOptions);
+    RichMd::SetCurrentContext(hostFonts);
+    DrawFrame(1.f);
+    ok = Expect("the host's bold font", RichMd::GetFont(RichMd::MarkdownFontSpec(false, true)).font == hostFont) && ok;
+    ok = Expect("the host's code font", RichMd::GetCodeFont().font == hostFont) && ok;
+    ok = Expect("no host regular font: the file's", RichMd::GetFont(RichMd::MarkdownFontSpec()).font != hostFont) && ok;
+    RichMd::DestroyContext(hostFonts);
+    RichMd::SetCurrentContext(fileFonts);
 
     RichMd::DestroyContext();
     ImGui_ImplNull_Shutdown();

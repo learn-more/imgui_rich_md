@@ -195,6 +195,14 @@ struct MarkdownFontOptions
     // Fonts merged into every markdown font (asset paths), e.g. an icon or a CJK font.
     // Since Dear ImGui 1.92 glyphs are loaded on demand, so merging a large font costs nothing until it is used.
     std::vector<std::string> mergeFonts;
+
+    // Fonts the application already loaded (e.g. system fonts), used as they are instead of the font files.
+    // nullptr: loaded from the files. mergeFonts are not merged into them.
+    ImFont* regularFont = nullptr;
+    ImFont* boldFont = nullptr;
+    ImFont* italicFont = nullptr;
+    ImFont* boldItalicFont = nullptr;
+    ImFont* codeFont = nullptr;
 };
 
 
