@@ -795,6 +795,14 @@ namespace RichMd
                 mMarkdownOptions->callbacks.OnHeading(level, text);
         }
 
+        void context_menu() override
+        {
+            if (!mMarkdownOptions->callbacks.OnContextMenu)
+                return;
+            ImGui::Separator();
+            mMarkdownOptions->callbacks.OnContextMenu();
+        }
+
         image_status get_image(image_info& nfo) const override
         {
             if (! mMarkdownOptions->callbacks.OnImage)

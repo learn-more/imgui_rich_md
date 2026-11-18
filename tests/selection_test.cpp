@@ -12,6 +12,7 @@
 
 static std::string gClipboard;
 static std::string gOpenedLink;
+static bool gHostItemClicked = false;
 static int gPushSelectable = -1;  // -1: no PushSelectableText() around the render, else its value
 static bool gForgetPop = false;   // a PushSelectableText() without its PopSelectableText()
 
@@ -331,7 +332,7 @@ static void ClickMenuItem(const char* markdown, float width, int index, int sepa
         return;
     }
     const ImGuiStyle& style = ImGui::GetStyle();
-    float fontSize = ImGui::GetStyle().FontSizeBase;
+    float fontSize = LineHeight();  // the menu opens inside the render, in the markdown font
     float y = menu->DC.CursorStartPos.y + (float)index * (fontSize + style.ItemSpacing.y)
               + (float)separators * (1.f + style.ItemSpacing.y) + fontSize * 0.5f;
     MouseTo(ImVec2(menu->DC.CursorStartPos.x + 10.f, y));
@@ -359,6 +360,12 @@ static bool CheckMenu()
     ClickAndCopy(md, 600.f, inTwo, 1, 1);  // a right click opens the menu (and Ctrl+C is ignored while it is open)
     ClickMenuItem(md, 600.f, 1, 0);        // Copy, Copy as Markdown, ---, Select All
     ok = Expect("Copy as Markdown", gClipboard, "- item **one**\n- item two") && ok;
+    ClickAndCopy(md, 600.f, inTwo, 1, 1);
+    ClickMenuItem(md, 600.f, 3, 2);  // Copy, Copy as Markdown, ---, Select All, ---, the application's item
+    if (!gHostItemClicked) {
+        printf("selection test failed: the application's menu item\n");
+        ok = false;
+    }
 
     ImVec2 onLink(f.textOrigin.x + TextWidth("A ") + TextWidth("link") * 0.5f,
                   f.textEndY - ImGui::GetStyle().ItemSpacing.y - LineHeight() * 0.5f);
@@ -426,6 +433,10 @@ int main(int, char**)
     ImGui::GetPlatformIO().Platform_GetClipboardTextFn = [](ImGuiContext*) { return gClipboard.c_str(); };
     RichMd::MarkdownOptions options;
     options.callbacks.OnOpenLink = [](const std::string& url) { gOpenedLink = url; };
+    options.callbacks.OnContextMenu = [] {
+        if (ImGui::MenuItem("Host item"))
+            gHostItemClicked = true;
+    };
     RichMd::Context* mainContext = RichMd::CreateContext(options);
     DrawFrame("warm up", 400.f);  // the first frame loads the fonts
 

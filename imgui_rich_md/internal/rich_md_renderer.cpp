@@ -2581,7 +2581,8 @@ void Renderer::update_selection(ImGuiID fragmentId)
 	show_selection_menu(fragmentId);
 }
 
-// The menu of a right click: Copy, Copy as Markdown, Select All, Copy Link over a link, Fold All and Unfold All
+// The menu of a right click: Copy, Copy as Markdown, Select All, Copy Link over a link, Fold All and Unfold All,
+// then the application's items
 void Renderer::show_selection_menu(ImGuiID fragmentId)
 {
 	if (!ImGui::BeginPopup("##rich_md_selection_menu"))
@@ -2612,6 +2613,7 @@ void Renderer::show_selection_menu(ImGuiID fragmentId)
 		if (ImGui::MenuItem("Unfold All"))
 			fold_all(false);
 	}
+	context_menu();
 	ImGui::EndPopup();
 }
 

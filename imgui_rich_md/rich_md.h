@@ -299,6 +299,10 @@ namespace RichMd
         // OnHeading: called after each heading is rendered, with its level (1 to 6) and its text
         // (without markup): for a table of contents, or scrolling to an anchor.
         std::function<void(int level, const std::string& text)> OnHeading;
+
+        // OnContextMenu: adds the application's items (ImGui::MenuItem...) at the end of the menu of a right click on
+        // the text, below a separator. For an application whose own menu would otherwise open only beside the text.
+        VoidFunction OnContextMenu;
     };
 
 

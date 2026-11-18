@@ -203,6 +203,8 @@ protected:
 	virtual void open_wikilink() const;
 	// A heading was rendered (its text without markup)
 	virtual void heading(int level, const std::string& text);
+	// The end of the menu of a right click on the text: the application's items
+	virtual void context_menu() {}
 
 	//returns true if the term has been processed
 	virtual bool render_entity(const char* str, const char* str_end);
